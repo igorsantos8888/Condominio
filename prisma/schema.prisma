@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// criar uma migration: npm prisma migrate dev
+
+model Condominio {
+  id             String    @id @default(uuid())
+  razaoSocial    String
+  cnpj           String
+  ie             String
+  im             String
+  email          String
+  telefone       String
+  celular        String
+  endereco       String
+  numeroEnd      String
+  complementoEnd String
+  bairro         String
+  cidade         String
+  estado         String
+  cep            String
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+
+  ususarios Usuarios[]
+  blocos    Blocos[]
+  pessoas   Pessoas[]
+  periodos  Periodos[]
+  categoria Categoria[]
+  conta     Conta?
+  Cobrancas Cobrancas[]
+
+  @@map("condominio")
+}
+
+model Usuarios {
+  id         String    @id @default(uuid())
+  username   String
+  senha      String
+  ativo      Boolean
+  nome       String
+  sobrenome  String
+  email      String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  condominio Condominio @relation(fields: [condominio_id], references: [id])
+
+  condominio_id String
+
+  @@map("usuarios")
+}
+
+model Blocos {
+  id        String @id @default(uuid())
+  sigla     String
+  descricao String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String
+
+  @@map("blocos")
+}
+
+model Pessoas {
+  id             String @id @default(uuid())
+  nome           String
+  email          String
+  telefone       String
+  celular        String
+  endereco       String
+  numeroEnd      String
+  complementoEnd String
+  bairro         String
+  cidade         String
+  estado         String
+  cep            String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String
+
+  @@map("Pessoas")
+}
+
+model Periodos {
+  id           String @id @default(uuid())
+  inicio       String
+  fim          String
+  encerramento String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String
+
+  @@map("Periodos")
+}
+
+model Categoria {
+  id        String @id @default(uuid())
+  tipo      String
+  descricao String
+  nivel     String
+  ordem     String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String
+
+  @@map("categoria")
+}
+
+model Conta {
+  id           String @id @default(uuid())
+  sigla        String
+  descricao    String
+  saldoInicial String
+  SaldoAtual   String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String     @unique
+
+  @@map("conta")
+}
+
+model Cobrancas {
+  id                 String   @id @default(uuid())
+  motivoEmissao      String
+  numero             String
+  parcela            String
+  dataEmissao        DateTime
+  dataVencimento     DateTime
+  valor              Decimal  @default(10.2)
+  desconto           Decimal  @default(10.2)
+  abatimento         String
+  outrasDeducoes     String
+  jurosMora          Decimal  @default(10.2)
+  multa              Decimal  @default(10.2)
+  outrosAcrescimos   Decimal  @default(10.2)
+  total              Decimal  @default(10.2)
+  descricao          String
+  percentualJurosMes Decimal  @default(10.2)
+  percentualMulta    Decimal  @default(10.2)
+  situacao           Boolean
+  dataRecebimento    DateTime
+  motivoBaixa        String
+
+  condominio    Condominio @relation(fields: [condominio_id], references: [id])
+  condominio_id String
+
+  @@map("cobrancas")
+}
